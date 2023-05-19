@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import math
 
 def imgAnalyzer (caminhoCompleto):
     img = cv.imread(caminhoCompleto, cv.IMREAD_GRAYSCALE)
@@ -21,27 +22,29 @@ def imgAnalyzer (caminhoCompleto):
     blur = cv.GaussianBlur(img, (5, 5), 0)
     ret3, th3 = cv.threshold(blur, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
 
-    somenteBranco = cv.inRange(th2, 1, 255)
-    somentePreto = cv.inRange(th2, 0, 1)
+    somenteBranco = cv.inRange(th1, 1, 255)
+    somentePreto = cv.inRange(th1, 0, 1)
 
     pixelsBranco = cv.countNonZero(somenteBranco)
     pixelsPreto = cv.countNonZero(somentePreto)
 
-    reacao = (pixelsPreto / th2.size) * 100
+    reacao = (pixelsPreto / th1.size) * 100
 
-    print(caminhoCompleto, " - ", reacao, "% -- Média de cor dos pixels: ", imgCorOriginal.mean(),
+    print(caminhoCompleto, " - ", reacao, "% -- Média de cor dos pixels: ", redBGR.mean(),
           "(quanto menor valor, mais escuro, reação mais intensa)")
 
-
+    cv.imwrite("C:/Users/andreteixeira/Desktop/testeTH1/" + caminhoCompleto, th1)
+    cv.imwrite("C:/Users/andreteixeira/Desktop/testeTH2/" + caminhoCompleto, th2)
     #TESTE QUE AVALIA AREA DE REACAO + INTENSIDADE DA COR NO CARNAL VERMELHO, VALORES AJUSTADOS PARA TH2
     #se reação foi alta e cor escura,  ou se reacao for baixa mas cor escura
     if (reacao > 50 and redBGR.mean() < 40) or (reacao < 50 and redBGR.mean() < 40):
         print("Sugere Indivíduo Normal do ponto de vista sudomotor")
-        return {"resultado":"Sugere Indivíduo Normal do ponto de vista sudomotor"}
+        return "Sugere Indivíduo Normal do ponto de vista sudomotor\n"+ "- Reação: "+str(math.trunc(reacao)) + "% - Média cor pixels: "+str(math.trunc(redBGR.mean()))
     # se reação foi baixa e cor clara,  ou se reacao foi alta mas cor clara,
     elif (reacao < 50 and redBGR.mean() > 40) or (reacao > 50 and redBGR.mean() > 40) :
         print("Sugere Indivíduo com disfunção sudomotora")
-        return {"resultado":"Sugere Indivíduo com disfunção sudomotora"}
+        return "Sugere Indivíduo com disfunção sudomotora\n"+ "- Reação: "+str(math.trunc(reacao)) + "% - Média cor pixels: "+str(math.trunc(redBGR.mean()))
+
 
 
 
