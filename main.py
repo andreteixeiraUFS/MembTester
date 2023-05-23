@@ -1,7 +1,10 @@
 import io
-from fastapi import FastAPI, File
+from typing import Optional, List
+
+from fastapi import FastAPI, File, Form, UploadFile
 from PIL import Image
 import imageAnalyzer as imgA
+
 
 app = FastAPI()
 
@@ -11,16 +14,19 @@ def home():
 
 #recebe uma imagem e retorna um resultado
 @app.post('/tester')
-async def predict(image: bytes = File(...)):
-    img = io.BytesIO(image)
+async def predict(diabetes: str = Form(...), image: UploadFile = File(...)):
+    print(diabetes)
+
+    content = await image.read()  # async read
+    print(type(content))
+
+    img = io.BytesIO(content)
     img.seek(0)
 
     byteImg = Image.open(img)
-    byteImg.save('image.jpg', 'JPEG')
+    byteImg.save('lastImage.jpg', 'JPEG')
 
-    print(type(img))
-    print(type(byteImg))
-    return imgA.imgAnalyzer('image.jpg')
+    return imgA.imgAnalyzer(diabetes,'lastImage.jpg')
 
 
 # para start no servidor: uvicorn main:app --host 0.0.0.0 --port 8000
