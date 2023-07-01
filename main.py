@@ -15,8 +15,6 @@ def home():
 #recebe uma imagem e retorna um resultado
 @app.post('/tester')
 async def predict(diabetes: str = Form(...), image: UploadFile = File(...)):
-    print(diabetes)
-
     content = await image.read()  # async read
     print(type(content))
 
